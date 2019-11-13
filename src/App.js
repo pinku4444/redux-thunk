@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Button from '@material-ui/core/Button';
+import { connect } from 'react-redux';
+import { fetchUser } from './redux/actions/user';
+import { FETCH_USER_LOADING } from './redux/actions/type';
+import User from './User';
+import './App.css'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function App(props) {
+
+	const { loading, users } = props.users;
+	const [showUserSection, setShowUserSection] = useState(false);
+
+	const showUserSectionHandler = () => {
+		if(!showUserSection) {
+			props.fetchUsers();
+		}
+		
+		setShowUserSection(!showUserSection);
+
+	}
+
+
+	return (
+		<div>
+			<Button variant="outlined" onClick={showUserSectionHandler}>
+				{showUserSection ? "Hide User List" : "Show User List"}
+      </Button>
+			<div className={showUserSection ? "show" : "hide"} >
+				<User data={props.users} />
+			</div>
+		</div>
+	);
 }
 
-export default App;
+const mapStateToProps = (state) => {
+	return {
+		users: state.users
+	}
+}
+
+const mapsDispatchToProps = (dispatch) => {
+	return {
+		fetchUsers: () => dispatch(fetchUser())
+	}
+}
+
+export default connect(mapStateToProps, mapsDispatchToProps)(App);
